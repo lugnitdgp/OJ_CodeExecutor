@@ -1,4 +1,4 @@
-module OJserver
+module ojserver/ojserver
 
 go 1.15
 
