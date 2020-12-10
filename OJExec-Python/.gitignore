@@ -1,0 +1,13 @@
+**/migrations/**
+
+app.db
+
+.env
+
+.vscode/
+
+**/__pycache__/**
+
+venv/
+
+static/**
