@@ -1,12 +1,10 @@
 import os
-from app import app
-from flask import request
-from config import enginedir, staticdir, engine_path
-from app.models import File
 from urllib.request import urlretrieve
 from urllib.parse import unquote
-from app import db
-
+from flask import request, jsonify
+from app import app, db
+from config import enginedir, staticdir, engine_path
+from app.models import File
 
 def status():
     make_temp_status = "sudo cat usage.txt > temp_file"
@@ -71,7 +69,7 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 
 @app.route("/", methods=["POST"])
 def home():
-    exec_args = request.json.get("args")
+    exec_args = request.json.get("exec_args")
     try:
         with open(os.path.join(enginedir, exec_args["filename"]), "w+") as file:
             file.write(unquote(exec_args["code"]))
@@ -103,7 +101,6 @@ def home():
 
         if bool(File.query.filter_by(file_hash=output_file_hash[index]).first()):
             output_testfile = File.query.filter_by(file_hash=output_file_hash[index]).first().path
-
         else:
             output_testfile = urlretrieve(url, os.path.join(staticdir, output_file_urls[index].split("/")[-1]))[0]
             file = File(file_hash=output_file_hash[index], path=output_testfile)
@@ -112,7 +109,7 @@ def home():
         res = run(code_file, exec_args["time"], exec_args["mem"], input_testfile, temp_output_file, output_testfile,
                   exec_args["compile_command"], exec_args["run_command"])
         net_res.append(res)
-    return net_res
+    return jsonify(net_res)
 
 
 '''
