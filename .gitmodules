@@ -1,0 +1,3 @@
+[submodule "OJExec-Python/safeexec"]
+	path = OJExec-Python/safeexec
+	url = https://github.com/realsdx/safeexec.git
