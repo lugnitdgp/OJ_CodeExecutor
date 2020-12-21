@@ -11,3 +11,11 @@ app.db
 venv/
 
 static/**
+
+files.db
+
+usage.txt
+
+temp_file
+
+compile_log

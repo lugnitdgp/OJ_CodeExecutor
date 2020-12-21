@@ -20,25 +20,33 @@ from interface.models import *
 
 app = Celery("tasks", broker=config("CELERY_BROKER_URL"))
 
-def write_json(data, filename='file-info.json'): 
-    with open(filename,'w') as f: 
-        json.dump(data, f, indent=4) 
+
+def configLocalDb(conn):
+    conn.execute('''CREATE TABLE IF NOT EXISTS FILES (
+                file_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_hash TEXT NOT NULL,
+                file_path TEXT NOT NULL
+                );''')
+
 
 def putData(fhash, path):
-    with open("file-info.json", "r") as fileInfo:
-        data = json.load(fileInfo)
-        data[fhash] = path
-        write_json(data)
+    conn.execute("INSERT INTO FILES (file_hash, file_path) VALUES (?, ?);", (
+        fhash,
+        path,
+    ))
+    conn.commit()
 
 def checkData(fhash):
-    with open("file-info.json", "r") as fileInfo:
-        data = json.load(fileInfo)
-    return fhash in data
+    cursor = conn.execute("SELECT count(*) FROM FILES WHERE file_hash = ?", (fhash, ))
+    data = cursor.fetchone()
+    return bool(data)
+
 
 def getData(fhash):
-    with open("file-info.json", "r") as fileInfo:
-        data = json.load(fileInfo)
-    return data.get(fhash)
+    cursor = conn.execute("SELECT file_path FROM FILES WHERE file_hash = ?", (fhash, ))
+    data = cursor.fetchone()
+    return data
+
 
 def db_store(user, result, ac, wa, job_id, contest, code, lang):
     j = Job(coder=user,
@@ -118,6 +126,7 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_urls, input_file_hash,
             output_file_hash):
     print("check1")
+    configLocalDb(conn)
     user = Coder.objects.get(email=coder['email'])
     contest = Contest.objects.get(contest_code=contest['contest_code'])
     ac, wa = 0, 0
@@ -132,12 +141,15 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
     except IOError:
         print("File I/O Error")
 
+    print("check2")
     f = os.path.join(enginedir, filename)
 
+    print("check3")
     input_testfile = ""
     output_testfile = ""
     temp_output_file = os.path.join(staticdir, execute.request.id.__str__() + ".txt")
 
+    print("check4")
     net_res = []
 
     for (index, url) in enumerate(input_file_urls, start=0):
