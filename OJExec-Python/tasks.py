@@ -8,8 +8,7 @@ from urllib.parse import unquote
 import django
 from celery import Celery
 from decouple import config
-from settings import FILE_HASHES
-from config import enginedir, staticdir, engine_path
+from settings import FILE_HASHES, enginedir, staticdir, engine_path
 
 sys.dont_write_bytecode = True
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")

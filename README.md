@@ -15,20 +15,16 @@ Then run
 ./ojserver
 ```
 
-## Build/Run Instructions (Python)
-
-cd into OJExec-Python directory and run
+## Production instructions
 
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-export FLASK_APP=run.py
-flask db init
-flask db migrate -m "file table"
-flask db update
-flask run
+cd OJExec-Python
+source setup-worker.sh
+```
+
+Edit the .env file with necessary details and restart the executor worker by the following command:
+``` 
+sudo supervisorctl restart executor
 ```
 
 ## Safeexec Submodule
