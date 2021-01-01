@@ -20,9 +20,11 @@ from interface.models import *
 
 app = Celery("tasks", broker=config("CELERY_BROKER_URL"))
 
-def write_json(data, filename='file-info.json'): 
-    with open(filename,'w') as f: 
-        json.dump(data, f, indent=4) 
+
+def write_json(data, filename='file-info.json'):
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=4)
+
 
 def putData(fhash, path):
     with open("file-info.json", "r") as fileInfo:
@@ -30,15 +32,18 @@ def putData(fhash, path):
         data[fhash] = path
         write_json(data)
 
+
 def checkData(fhash):
     with open("file-info.json", "r") as fileInfo:
         data = json.load(fileInfo)
     return fhash in data
 
+
 def getData(fhash):
     with open("file-info.json", "r") as fileInfo:
         data = json.load(fileInfo)
     return data.get(fhash)
+
 
 def db_store(user, result, ac, wa, job_id, contest, code, lang):
     j = Job(coder=user,
@@ -117,7 +122,6 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 @app.task
 def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_urls, input_file_hash,
             output_file_hash):
-    print("check1")
     user = Coder.objects.get(email=coder['email'])
     contest = Contest.objects.get(contest_code=contest['contest_code'])
     ac, wa = 0, 0
@@ -141,7 +145,6 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
     net_res = []
 
     for (index, url) in enumerate(input_file_urls, start=0):
-        print(url)
         if checkData(input_file_hash[index]):
             input_testfile = getData(input_file_hash[index])
         else:
