@@ -153,7 +153,7 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
         if checkData(output_file_hash[index]):
             output_testfile = getData(output_file_hash[index])
         else:
-            output_testfile = urlretrieve(url, os.path.join(staticdir, output_file_urls[index].split("/")[-1]))[0]
+            output_testfile = urlretrieve(output_file_urls[index], os.path.join(staticdir, output_file_urls[index].split("/")[-1]))[0]
             putData(output_file_hash[index], output_testfile)
         res = run(f, exec_args["time"], exec_args["mem"], input_testfile, temp_output_file, output_testfile,
                   language.compile_command, language.run_command)
