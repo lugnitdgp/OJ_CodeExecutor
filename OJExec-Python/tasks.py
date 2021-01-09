@@ -44,12 +44,13 @@ def getData(fhash):
     return data.get(fhash)
 
 
-def db_store(user, result, ac, wa, job_id, contest, code, lang):
+def db_store(user, result, ac, wa, compile_error, job_id, contest, code, lang):
     j = Job(coder=user,
             code=code,
             status=json.dumps(result),
             AC_no=ac,
             WA_no=wa,
+            compile_error=compile_error,
             job_id=job_id,
             contest=contest,
             timestamp=t.now(),
@@ -124,6 +125,7 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
     user = Coder.objects.get(email=coder['email'])
     contest = Contest.objects.get(contest_code=contest['contest_code'])
     ac, wa = 0, 0
+    compiler_error = False
     language = contest.contest_langs.get(name=lang)
     ext = language.ext
     filename = execute.request.id.__str__() + "." + ext
@@ -159,12 +161,15 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
         res = run(f, exec_args["time"], exec_args["mem"], input_testfile, temp_output_file, output_testfile,
                   language.compile_command, language.run_command)
         net_res.append(res)
+        if res['code']==1:
+            break
 
     for result in net_res:
         if (result['code'] == 1):
+            compiler_error = True
             break
         elif (result['code'] == 0 and result['status']['run_status'] == "AC"):
             ac += 1
         elif (result['code'] == 0 and result['status']['run_status'] == "WA"):
             wa += 1
-    db_store(user, net_res, ac, wa, execute.request.id.__str__(), contest, code, lang)
+    db_store(user, net_res, ac, wa, compiler_error, execute.request.id.__str__(), contest, code, lang)
