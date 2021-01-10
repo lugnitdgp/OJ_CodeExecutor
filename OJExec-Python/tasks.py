@@ -149,7 +149,7 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
         if checkData(input_file_hash[index]):
             input_testfile = getData(input_file_hash[index])
         else:
-            input_testfile = urlretrieve(url, os.path.join(staticdir, url.split("/")[-1]))[0]
+            input_testfile = urlretrieve(url, os.path.join(staticdir, "_".join(url.split("/")[-2:])))[0]
             putData(input_file_hash[index], input_testfile)
 
         if checkData(output_file_hash[index]):
