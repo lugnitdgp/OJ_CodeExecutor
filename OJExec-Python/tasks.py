@@ -143,7 +143,7 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
 
     input_testfile = ""
     output_testfile = ""
-    filename = contest.code + "_"
+    filename = contest.contest_code + "_"
     temp_output_file = os.path.join(staticdir, execute.request.id.__str__() + ".txt")
 
     net_res = []
