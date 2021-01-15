@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os
+import time
 import sys
 import json
 import sqlite3
@@ -122,6 +123,7 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 @app.task
 def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_urls, input_file_hash,
             output_file_hash):
+    start_time = time.time()
     user = Coder.objects.get(email=coder['email'])
     contest = Contest.objects.get(contest_code=contest['contest_code'])
     ac, wa = 0, 0
@@ -141,6 +143,7 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
 
     input_testfile = ""
     output_testfile = ""
+    filename = contest.code + "_"
     temp_output_file = os.path.join(staticdir, execute.request.id.__str__() + ".txt")
 
     net_res = []
@@ -149,14 +152,14 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
         if checkData(input_file_hash[index]):
             input_testfile = getData(input_file_hash[index])
         else:
-            input_testfile = urlretrieve(url, os.path.join(staticdir, "_".join(url.split("/")[-2:])))[0]
+            input_testfile = urlretrieve(url, os.path.join(staticdir, filename+"_".join(url.split("/")[-3:])))[0]
             putData(input_file_hash[index], input_testfile)
 
         if checkData(output_file_hash[index]):
             output_testfile = getData(output_file_hash[index])
         else:
             temp_url = output_file_urls[index]
-            output_testfile = urlretrieve(temp_url, os.path.join(staticdir, "_".join(temp_url.split("/")[-2:])))[0]
+            output_testfile = urlretrieve(temp_url, os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:])))[0]
             putData(output_file_hash[index], output_testfile)
         res = run(f, exec_args["time"], exec_args["mem"], input_testfile, temp_output_file, output_testfile,
                   language.compile_command, language.run_command)
@@ -172,4 +175,5 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
             ac += 1
         elif (result['code'] == 0 and result['status']['run_status'] == "WA"):
             wa += 1
+    print(time.time() - start_time)
     db_store(user, net_res, ac, wa, compiler_error, execute.request.id.__str__(), contest, code, lang)
