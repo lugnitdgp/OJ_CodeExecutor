@@ -19,6 +19,7 @@ INSTALLED_APPS = (
     "django.contrib.auth",
     'accounts.apps.AccountsConfig',
     "interface.apps.InterfaceConfig",
+    'django_celery_results',
 )
 
 DATABASES = {
@@ -33,6 +34,13 @@ DATABASES = {
 }
 
 SECRET_KEY = config("SECRET_KEY")
+
+CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
 
 FILE_HASHES = {}
 

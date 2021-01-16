@@ -18,7 +18,9 @@ django.setup()
 from accounts.models import *
 from interface.models import *
 
-app = Celery("tasks", broker=config("CELERY_BROKER_URL"))
+app = Celery("tasks")
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()
 
 
 def write_json(data, filename='file-info.json'):
