@@ -134,6 +134,8 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
     ext = language.ext
     filename = execute.request.id.__str__() + "." + ext
 
+    raise("Manual Erro")
+
     try:
         with open(os.path.join(enginedir, filename), "w+") as file:
             file.write(unquote(code))
@@ -146,11 +148,11 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
     input_testfile = ""
     output_testfile = ""
     filename = contest.contest_code + "_"
-    temp_output_file = os.path.join(staticdir, execute.request.id.__str__() + ".txt")
 
     net_res = []
 
     for (index, url) in enumerate(input_file_urls, start=0):
+        temp_output_file = os.path.join(staticdir, execute.request.id.__str__() + "_{}.txt".format(index))
         if checkData(input_file_hash[index]):
             input_testfile = getData(input_file_hash[index])
         else:
