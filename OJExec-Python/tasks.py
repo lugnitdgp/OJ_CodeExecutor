@@ -87,7 +87,7 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 
     if (os.stat("compile_log").st_size != 0):
         with open("compile_log", "r+") as temp_file:
-            error = temp_file.read().replace(f+":"," \n").replace("^~~~","\n")
+            error = temp_file.read().replace(f+":"," \n").replace(f,"checking.py").replace("^~~~","\n")
             return {"code": 1, "message": error}
 
     else:
