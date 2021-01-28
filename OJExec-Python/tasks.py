@@ -87,7 +87,8 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 
     if (os.stat("compile_log").st_size != 0):
         with open("compile_log", "r+") as temp_file:
-            return {"code": 1, "message": temp_file.read()}
+            error = temp_file.read().replace(f+":"," \n").replace("^~~~","\n")
+            return {"code": 1, "message": error}
 
     else:
         params = {
@@ -133,8 +134,6 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
     language = contest.contest_langs.get(name=lang)
     ext = language.ext
     filename = execute.request.id.__str__() + "." + ext
-
-    raise("Manual Erro")
 
     try:
         with open(os.path.join(enginedir, filename), "w+") as file:
