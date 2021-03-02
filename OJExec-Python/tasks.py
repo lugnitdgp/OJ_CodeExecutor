@@ -155,15 +155,15 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
         if checkData(input_file_hash[index]):
             input_testfile = getData(input_file_hash[index])
         else:
-            input_testfile = urlretrieve(url, os.path.join(staticdir, filename+"_".join(url.split("/")[-3:])))[0]
-            putData(input_file_hash[index], input_testfile)
+            os.system('sudo curl {} -o {} -s'.format(url,os.path.join(staticdir, filename+"_".join(url.split("/")[-3:]))))
+            putData(input_file_hash[index], os.path.join(staticdir, filename+"_".join(url.split("/")[-3:])))
 
         if checkData(output_file_hash[index]):
             output_testfile = getData(output_file_hash[index])
         else:
             temp_url = output_file_urls[index]
-            output_testfile = urlretrieve(temp_url, os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:])))[0]
-            putData(output_file_hash[index], output_testfile)
+            os.system('sudo curl {} -o {} -s'.format(temp_url, os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:]))))
+            putData(output_file_hash[index], os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:])))
         res = run(f, exec_args["time"], exec_args["mem"], input_testfile, temp_output_file, output_testfile,
                   language.compile_command, language.run_command)
         net_res.append(res)
