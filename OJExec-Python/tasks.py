@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import os
-import time
+from django.utils.timezone import timezone
 import sys
 import json
 import sqlite3
@@ -56,7 +56,7 @@ def db_store(user, result, ac, wa, compile_error, job_id, contest, code, lang):
             compile_error=compile_error,
             job_id=job_id,
             contest=contest,
-            timestamp=t.now(),
+            timestamp=timezone.now(),
             lang=lang)
     j.save()
 
@@ -126,7 +126,6 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
 @app.task
 def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_urls, input_file_hash,
             output_file_hash):
-    start_time = time.time()
     user = Coder.objects.get(email=coder['email'])
     contest = Contest.objects.get(contest_code=contest['contest_code'])
     ac, wa = 0, 0
@@ -178,5 +177,4 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
             ac += 1
         elif (result['code'] == 0 and result['status']['run_status'] == "WA"):
             wa += 1
-    print(time.time() - start_time)
     db_store(user, net_res, ac, wa, compiler_error, execute.request.id.__str__(), contest, code, lang)
