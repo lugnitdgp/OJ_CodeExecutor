@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import os
-from django.utils.timezone import timezone
+from django.utils import timezone
 import sys
 import json
 import sqlite3
@@ -101,7 +101,7 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
             "temp_out_file": temp_output_file
         }
         runner = run_command.format(**params)
-        os.system(runner)
+        os.system("bash -c \'{}\'".format(runner))
         stat = status()
         res = None
 
