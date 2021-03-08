@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import os
-from django.utils import timezone
+import time
 import sys
 import json
 import sqlite3
@@ -9,6 +9,7 @@ from urllib.parse import unquote
 import django
 from celery import Celery
 from decouple import config
+from django.utils import timezone
 from settings import FILE_HASHES, enginedir, staticdir, engine_path
 
 sys.dont_write_bytecode = True
@@ -101,7 +102,7 @@ def run(f, time, mem, input_file, temp_output_file, output_file, compile_command
             "temp_out_file": temp_output_file
         }
         runner = run_command.format(**params)
-        os.system("bash -c \'{}\'".format(runner))
+        os.system(runner)
         stat = status()
         res = None
 
@@ -154,15 +155,15 @@ def execute(coder, code, lang, contest, exec_args, input_file_urls, output_file_
         if checkData(input_file_hash[index]):
             input_testfile = getData(input_file_hash[index])
         else:
-            os.system('sudo curl {} -o {} -s'.format(url,os.path.join(staticdir, filename+"_".join(url.split("/")[-3:]))))
-            putData(input_file_hash[index], os.path.join(staticdir, filename+"_".join(url.split("/")[-3:])))
+            input_testfile = urlretrieve(url, os.path.join(staticdir, filename+"_".join(url.split("/")[-3:])))[0]
+            putData(input_file_hash[index], input_testfile)
 
         if checkData(output_file_hash[index]):
             output_testfile = getData(output_file_hash[index])
         else:
             temp_url = output_file_urls[index]
-            os.system('sudo curl {} -o {} -s'.format(temp_url, os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:]))))
-            putData(output_file_hash[index], os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:])))
+            output_testfile = urlretrieve(temp_url, os.path.join(staticdir, filename+"_".join(temp_url.split("/")[-3:])))[0]
+            putData(output_file_hash[index], output_testfile)
         res = run(f, exec_args["time"], exec_args["mem"], input_testfile, temp_output_file, output_testfile,
                   language.compile_command, language.run_command)
         net_res.append(res)
