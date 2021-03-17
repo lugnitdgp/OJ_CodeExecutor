@@ -76,7 +76,7 @@ def status():
 
 
 def compare(path1, path2):
-    compare_code = os.system("diff -q " + path1 + " " + path2)
+    compare_code = os.system("diff -qZB " + path1 + " " + path2)
     if compare_code == 0:
         return True
     else:
