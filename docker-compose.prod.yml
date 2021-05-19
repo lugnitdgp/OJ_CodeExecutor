@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  executor:
+    build: .
+    image: localhost:5000/oj-executor
+    ports:
+      - "80:80"
+    deploy:
+      mode: replicated
+      replicas: 3

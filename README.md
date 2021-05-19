@@ -2,7 +2,7 @@
 
 A server side application to process requests to run code submitted by the user thorugh th OJ frontend.
 
-## Production instructions
+## Production instructions without Docker (strongly unrecommended):
 
 ```
 cd OJExec-Python
@@ -34,48 +34,51 @@ git pull --recurse-submodules
 
 ## Docker Setup
 
-Temporary docker image can be found at `phantsure/oj:latest` on docker hub.
-Before creating docker image create/update the .env in `OJExec-Python`. To create image:
+To setup docker swarm, first install docker to the server using `sudo apt install docker.io` on each worker and manager server and also install `docker-compose` fom [here](https://docs.docker.com/compose/install/) on the manager server.
 
-```
-docker build -t oj/executor .
-```
-The image has to be pushed to docker hub or github packages. For docker hub:
-```
-docker login
-docker tag oj/executor USERNAME/REPONAME:TAG
-docker push USERNAME/REPONAME:TAG
-```
+Docker swarm requires an image to be deployed so we will need to keep a temporary storage to store them, which we fulfill using registry.
 
-To setup docker swarm, first install docker to the server using [this guide](https://docs.docker.com/engine/install/ubuntu/)
-On manager/master node:
+To run registry first we need to run the command:
+`sudo docker service create --name registry --publish published=5000,target=5000 registry:2`
+ and make sure you expose port 5000 of the manager node else the worker nodes wont be able to access it.
+
+To build the image use 
+`sudo docker-compose -f docker-compose.prod.yml build`
+and to push it use `sudo docker-compose -f docker-compose.prod.yml push`.
+
+On manager node:
 ```
 docker swarm init
-docker swarm join-token worker
 ```
-Copy the provided command and type that to worker/slave nodes to join the swarm.
+Copy the provided command and type that to worker nodes to join the swarm.
 
-To start the service using the image we uploaded
+To start the service using the image we uploaded:
+
 ```
-docker service create --replicas 3 --name executor USERNAME/REPONAME:TAG
+sudo docker stack deploy -c docker-compose.prod.yml executor
 ```
-Note: `3` is just taken as an example any number can be put there.
+
+Note: The deploy configurantion contains the default number of replicase which in this case is `3` and is just taken as an example any number can be put there, but keep in mind the threshold of your server. We have assumed for safety purposes to allocate around 500 MB for each worker, so in a 2 GB RAM server you should have at max 4 workers running.
 
 ### Swarm updates
+
 Scaling
 ```
-docker service scale executor=5
-```
+docker service scale executor_executor=5
+``` 
+if you want the direct command but since we are using `docker stack` we can just modify the number of replicas inside the local `docker-compose.prod.yml` and update the service using `sudo docker stack deploy -c docker-compose.prod.yml executor` and check using `sudo docker stack services executor`.
+
 Note: Use the service you want to scale like in our case it was `executor`
 
 Updating the image
 ```
-docker service update --image NEWIMAGE:TAG executor
+sudo docker stack deploy -c docker-compose.prod.yml executor
 ```
+as `stack deploy` is both used to create and update a stack.
 
-Remove service
+Remove a stack
 ```
-docker service rm executor
+sudo docker stack rm executor
 ```
 
 Leaving the swarm(Can be run on any node)
@@ -86,5 +89,5 @@ docker swarm leave
 ### Debug 
 To join the docker container to debug, first get the container id using `docker ps`.
 ```
-docker exec -it CONTAINERID /bin/bash
+sudo docker exec -it CONTAINERID /bin/bash
 ```
