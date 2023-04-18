@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.10
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata && apt-get install -y build-essential default-jre default-jdk cmake python3-venv debconf-utils git rpl supervisor systemctl curl python2
 RUN apt-get install -y sudo
