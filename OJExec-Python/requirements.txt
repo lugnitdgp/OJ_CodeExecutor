@@ -12,7 +12,7 @@ click-repl==0.1.6
 Django==3.1.4
 django-celery-results==2.0.0
 django-tinymce==3.2.0
-Flask==1.1.2
+Flask==2.2.5
 Flask-Migrate==2.5.3
 Flask-SQLAlchemy==2.4.4
 flower==0.9.5
