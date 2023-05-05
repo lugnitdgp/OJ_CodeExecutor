@@ -9,7 +9,7 @@ click==7.1.2
 click-didyoumean==0.0.3
 click-plugins==1.1.1
 click-repl==0.1.6
-Django==3.1.4
+Django==3.2.19
 django-celery-results==2.0.0
 django-tinymce==3.2.0
 Flask==1.1.2
